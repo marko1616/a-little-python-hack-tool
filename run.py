@@ -247,6 +247,7 @@ def Brute_force_mysql_password():
 
 print("Setup in ", time.time() - tick, "seconds.")#初始化计时
 while True:#喜闻乐见的主循环
+    os_command = False
     tool_number = 12
 
     print("如果要选择插件请输入插件名字")
@@ -310,6 +311,14 @@ while True:#喜闻乐见的主循环
         Generate_trojan_virus()
     elif choose == 11:
         countrol_zombie_computer()
+    else:
+        os_command = True
+
     for i in plugins_list:
         if choose == i:
             exec(i + ".run()")
+            os_command = False
+
+    if os_command:
+        os.system(choose)
+        time.sleep(2)
