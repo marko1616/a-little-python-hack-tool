@@ -54,6 +54,30 @@ print("+--------------------------------------------------------------+")
 print("|          bilibili:space.bilibili.com/385353604               |")
 print("+--------------------------------------------------------------+")
 
+print("loding plugins...")
+
+plugins_list = []
+plugins_dir = os.path.join(os.getcwd() + '/plugins')
+sys.path.append(os.getcwd() + '/plugins')
+
+for (dirpath, dirnames, filenames) in os.walk(plugins_dir):
+    for plugins_name in filenames:
+        if os.path.splitext(plugins_name)[1] == '.py':
+            exec("import " + os.path.splitext(plugins_name)[0])
+            print("import " + os.path.splitext(plugins_name)[0] + "...Done")
+            plugins_list.append(os.path.splitext(plugins_name)[0])
+
+print("plugins loding...Done")
+print("password list loding...")
+
+password_list = []
+file = open('pass.txt','r')
+for i in file:
+    password_list.append(i)
+file.close()
+
+print("password list read...Done")
+
 def ARP_poof_with_not_ARPping():#ARP欺骗不带ARPPing
     
     target = input("Enter the target IP like 127.0.0.1:")#目标输入不用我多说把。
@@ -218,9 +242,14 @@ def countrol_zombie_computer():
         data = conn.recv(4096)
         print(data.decode("utf-8"))
 
+def Brute_force_mysql_password():
+    pass
+
 print("Setup in ", time.time() - tick, "seconds.")#初始化计时
 while True:#喜闻乐见的主循环
+    tool_number = 12
 
+    print("如果要选择插件请输入插件名字")
     print("quit(0)")#告诉用户对应的功能
     print("ARPspoof with ARPPing.(1)")
     print("SYN flood(2)")
@@ -245,6 +274,10 @@ while True:#喜闻乐见的主循环
     print("DHCP洪水(9)")
     print("生成木马病毒(10)")
     print("控制肉鸡(11)")
+    print("------------------pulgins-------------------")
+    for i in plugins_list:
+        print(i + "(" + str(tool_number) + ")")
+        tool_number = tool_number + 1
 
     choose = input(">>>")#用户选择输入
 
@@ -277,5 +310,6 @@ while True:#喜闻乐见的主循环
         Generate_trojan_virus()
     elif choose == 11:
         countrol_zombie_computer()
-    else:#如果输入无效就告诉用户输入无效
-        print("Don't have this choose")
+    for i in plugins_list:
+        if choose == i:
+            exec(i + ".run()")
