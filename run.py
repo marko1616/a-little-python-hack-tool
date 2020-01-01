@@ -454,7 +454,10 @@ while True:#喜闻乐见的主循环
         print("路由跟踪(11)")
         print("DNS污染(12)")
         print("land攻击(这个攻击很古老了 13)")
-    print("------------------pulgins-------------------")
+    if chinses_mode:
+        print("--------------------插件--------------------")
+    else:
+        print("------------------pulgins-------------------")
     for i in plugins_list:
         print(i + "(" + str(tool_number) + ")")
         tool_number = tool_number + 17
