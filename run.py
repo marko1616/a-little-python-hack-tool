@@ -20,6 +20,12 @@ except:
     import sys
     input("按回车退出")
     sys.exit(0)
+
+try:
+    import requests
+except:
+    print("你是不是忘了安装requests模块")
+    print("如何执行指令windows:python -m pip install requests liunx:sudo python -m pip install requests")
 import random, sys, uuid, os, logging#导入需要的自带模块
 import socket as sk
 
@@ -108,6 +114,11 @@ for i in file:
 file.close()
 
 print("password list read...Done")
+
+file = open("server_dir_dictionary.txt",'r',encoding='utf-8')#读取服务器后台目录字典
+server_dir_dictionary = []
+for i in file:
+    server_dir_dictionary.append("/" + i.replace("\n",""))#一定要替换\n
 
 class ARP_poof():
     def ARP_poof_with_not_ARPping(self):#ARP欺骗不带ARPPing
@@ -419,6 +430,7 @@ def land_attack():
         except KeyboardInterrupt:
             break
         except OSError:
+            logging.error("the tarrget IP is not confrom to the IP format.user input IP is '" + str(target) + "'.")
             if chinses_mode:
                 print("你输入的地址不符合IP格式。")
                 time.sleep(1)
@@ -427,6 +439,36 @@ def land_attack():
                 print("The address you entered does not conform to the IP format.")
                 time.sleep(1)
                 break
+
+def Server_background_scan():
+    if chinses_mode:
+        target = input("请输入目标IP或域名:")
+        http_or_https = input("使用HTTP协议还是HTTPS协议(1 http,2 https)")
+    else:
+        target = input("Enter the target IP or domain:")
+        http_or_https = input("You want to use http or https?(1 http,2 https)")
+    if http_or_https == "1":
+        http = True
+    elif http_or_https == "2":
+        http = False
+    else:
+        logging.WARNING("user do not choose use http or https.")
+        if chinses_mode:
+            print("你没有选择是用http还是https")
+        else:
+            print("You have no choice whether to use HTTP or HTTPS.")
+        return
+    for i in server_dir_dictionary:
+        if http:
+            r = requests.get("http://" + target + i)
+        else:
+            r = requests.get("https://" + target + i)
+        if r.status_code == 200:
+            if chinses_mode:
+                print("[+]找到目录:" + target + i + " 响应为200。")
+            else:
+                print("[+]find a dir:" + target + i + " Response is 200.")
+
 
 if chinses_mode:
     print("启动用了", time.time() - tick, "秒。")
@@ -456,6 +498,7 @@ while True:#喜闻乐见的主循环
         print("Trace router(11)")
         print("DNS pollution(12)")
         print("land attack(13)")
+        print("server background scan(14)")
     if chinses_mode:
         print("退出(0)")
         print("ARP欺骗(1)")
@@ -471,6 +514,7 @@ while True:#喜闻乐见的主循环
         print("路由跟踪(11)")
         print("DNS污染(12)")
         print("land攻击(这个攻击很古老了 13)")
+        print("服务器后台扫描(14)")
     if chinses_mode:
         print("--------------------插件--------------------")
     else:
@@ -486,6 +530,7 @@ while True:#喜闻乐见的主循环
         pass
 
     if choose == 0:#无聊的判断时间 PS:这里想吐槽python没有什么关键字你知道了把。
+        logging.info("user want to exit the program.")
         sys.exit(0)
     elif choose == 1:#时刻提醒自己要两的等于号。
         if chinses_mode:
@@ -547,6 +592,8 @@ while True:#喜闻乐见的主循环
         DNS_pollution()
     elif choose == 13:
         land_attack()
+    elif choose == 14:
+        Server_background_scan()
     else:
         os_command = True
 
@@ -560,4 +607,4 @@ while True:#喜闻乐见的主循环
         os.system(str(choose))
         time.sleep(2)
     else:
-        logging.info("user choose the tool " + str(choose) + ".")
+        logging.info("user choose the tool " + str(choose) + " to attack Done.")
