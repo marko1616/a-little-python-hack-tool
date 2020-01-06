@@ -1,14 +1,6 @@
 import requests, zipfile, os, shutil
-print("请不要在下载过程中终止程序不然你就只能去github更新了")
+print("请不要在安装过程中终止程序不然你就只能去github更新了")
 input("按回车开始下载")
-for i in os.listdir(os.getcwd()):
-    print("删除文件:" + i)
-    if i == 'upgrade.py':
-        continue
-    try:
-        shutil.rmtree(os.getcwd() + "\\" + i)
-    except NotADirectoryError:
-        os.unlink(os.getcwd() + "\\" + i)
 res = 0
 def download():
     try:
@@ -23,6 +15,14 @@ download()
 file = open('upgrade.zip','wb')
 file.write(res.content)
 file.close()
+for i in os.listdir(os.getcwd()):
+    if i == 'upgrade.py' or i == 'upgrade.zip':
+        continue
+    try:
+        shutil.rmtree(os.getcwd() + "\\" + i)
+    except NotADirectoryError:
+        os.unlink(os.getcwd() + "\\" + i)
+    print("删除文件:" + i)
 file = zipfile.ZipFile("upgrade.zip","r")
 file.extractall(os.getcwd())
 for i in os.listdir(os.getcwd() + "\\a-little-python-hack-tool-master"):
@@ -32,4 +32,3 @@ for i in os.listdir(os.getcwd() + "\\a-little-python-hack-tool-master"):
     except NotADirectoryError:
         shutil.copy(os.getcwd() + "\\a-little-python-hack-tool-master\\" + i,os.getcwd())
 input("更新成功按回车退出") 
-        
