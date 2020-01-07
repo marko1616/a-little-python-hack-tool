@@ -26,6 +26,18 @@ try:
 except:
     print("你是不是忘了安装requests模块")
     print("如何执行指令windows:python -m pip install requests liunx:sudo python -m pip install requests")
+    import sys
+    input("按回车退出")
+    sys.exit(0)
+try:
+    import progressbar
+except:
+    print("你是不是忘了安装progressbar模块")
+    print("如何执行指令windows:python -m pip install progressbar liunx:sudo python -m pip install progressbar")
+    import sys
+    input("按回车退出")
+    sys.exit(0)
+
 import random, sys, uuid, os, logging#导入需要的自带模块
 import socket as sk
 
@@ -119,7 +131,8 @@ file = open("server_dir_dictionary.txt",'r',encoding='utf-8')#读取服务器后
 server_dir_dictionary = []
 for i in file:
     server_dir_dictionary.append("/" + i.replace("\n",""))#一定要替换\n
-
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36'}
+progress = progressbar.ProgressBar()
 class ARP_poof():
     def ARP_poof_with_not_ARPping(self):#ARP欺骗不带ARPPing
 
@@ -441,6 +454,7 @@ def land_attack():
                 break
 
 def Server_background_scan():
+    dir_find = []
     if chinses_mode:
         target = input("请输入目标IP或域名:")
         http_or_https = input("使用HTTP协议还是HTTPS协议(1 http,2 https)")
@@ -458,17 +472,18 @@ def Server_background_scan():
         else:
             print("You have no choice whether to use HTTP or HTTPS.")
         return
-    for i in server_dir_dictionary:
+    for i in progress(server_dir_dictionary):
         if http:
-            r = requests.get("http://" + target + i)
+            r = requests.get("http://" + target + i,headers=headers)
         else:
-            r = requests.get("https://" + target + i)
+            r = requests.get("https://" + target + i,headers=headers)
         if r.status_code == 200:
-            if chinses_mode:
-                print("[+]找到目录:" + target + i + " 响应为200。")
-            else:
-                print("[+]find a dir:" + target + i + " Response is 200.")
-
+            dir_find.append(target + i)
+    for i in dir_find:
+        if chinses_mode:
+            print("目录:" + i + " 响应为200")
+        else:
+            print("dir:" + i + " response is 200.")
 
 if chinses_mode:
     print("启动用了", time.time() - tick, "秒。")
