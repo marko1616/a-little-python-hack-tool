@@ -485,6 +485,24 @@ def Server_background_scan():
         else:
             print("dir:" + i + " response is 200.")
 
+def debug():
+    if chinses_mode:
+        print("进入debug模式")
+    else:
+        print("run in debug mode")
+
+    while True:
+        command = input(">>>")
+        if command == 'quit':
+            return
+        else:
+            try:
+                exec(command)
+                logging.debug("debug command is:" + str(command))
+            except Exception as error:
+                traceback.print_exc()
+                logging.error("debug error " + str(error))
+
 if chinses_mode:
     print("启动用了", time.time() - tick, "秒。")
 else:
@@ -569,7 +587,7 @@ while True:#喜闻乐见的主循环
             if chinses_mode:
                 print("请输入数字")
             else:
-                print("You must enter a int")
+                print("must enter a int")
 
 
         if choose == 1:
@@ -609,6 +627,8 @@ while True:#喜闻乐见的主循环
         land_attack()
     elif choose == 14:
         Server_background_scan()
+    elif choose == 'debug':
+        debug()
     else:
         os_command = True
 
