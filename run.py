@@ -576,7 +576,7 @@ while True:#喜闻乐见的主循环
         print("------------------pulgins-------------------")
     for i in plugins_list:
         print(i + "(" + str(tool_number) + ")")
-        tool_number = tool_number + 17
+        tool_number = tool_number + 1
 
     choose = input(">>>")#用户选择输入
     try:#如果是数字输入就转为int类
