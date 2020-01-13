@@ -653,6 +653,8 @@ while True:#喜闻乐见的主循环
         Paralysis_the_network()
     elif choose == 'debug':
         debug()
+    elif choose == '':
+        continue
     else:
         os_command = True
 
